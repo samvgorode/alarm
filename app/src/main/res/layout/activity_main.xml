@@ -26,6 +26,14 @@
                 android:layout_height="match_parent"
                 android:weightSum="1">
 
+                <TextView
+                    android:text="TextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    android:id="@+id/currentDateTime"
+                    android:layout_weight="0.06" />
+
                 <EditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -56,11 +64,20 @@
                     android:layout_marginBottom="20dip"/>
                     android:layout_marginTop="20dip"/>
 
-                <TimePicker
+                <Button
+                    android:text="ВИБРАТИ ЧАС"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:focusable="true"
-                    android:id="@+id/timeStart" />
+                    android:background="#FF0D8A"
+                    android:textColor="#FFF5E8"
+                    android:id="@+id/chooseTime"
+                    android:onClick="setTime"/>
+
+                <!--<TimePicker-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:focusable="true"-->
+                    <!--android:id="@+id/timeStart" />-->
 
                 <TextView
                     android:text="ЯКОГО ДНЯ?"
@@ -72,10 +89,29 @@
                     android:layout_marginBottom="20dip"
                     android:layout_marginTop="20dip"/>
 
-                <DatePicker
+                <Button
+                    android:text="ВИБРАТИ ДАТУ"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/dateAlarm" />
+                    android:background="#FF0D8A"
+                    android:textColor="#FFF5E8"
+                    android:id="@+id/chooseDate"
+                    android:onClick="setDate"/>
+
+                <TextView
+                    android:text="ПІДТВЕРДИТИ?"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAlignment="center"
+                    android:id="@+id/submitText"
+                    style="@android:style/Widget.TextView.PopupMenu"
+                    android:layout_marginBottom="20dip"
+                    android:layout_marginTop="20dip"/>
+
+                <!--<DatePicker-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:id="@+id/dateAlarm" />-->
 
                 <Button
                     android:text="OK"

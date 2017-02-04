@@ -1,7 +1,11 @@
 package com.example.who.alarm;
 
 import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
@@ -18,6 +22,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -48,35 +53,42 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     Calendar mCalendar;
+    java.util.Calendar javaCalendar = java.util.Calendar.getInstance();
+    TextView currentDateTime;
     TextView timeFromText;
     TextView dateText;
     EditText title;
     EditText description;
-    TimePicker timeStart;
-    DatePicker dateDate;
+//    TimePicker timeStart;
+//    DatePicker dateDate;
     Button ok;
+    Button chooseTime;
+    Button chooseDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setCustomActionBar();
+
         title = (EditText) findViewById(R.id.title);
         description = (EditText) findViewById(R.id.description);
-        timeStart = (TimePicker) findViewById(R.id.timeStart);
-        timeStart.setIs24HourView(true);
-        setupUI(timeStart);
+//        timeStart = (TimePicker) findViewById(R.id.timeStart);
+//        timeStart.setIs24HourView(true);
         timeFromText = (TextView) findViewById(R.id.timeFromText);
-        setupUI(timeFromText);
+        //setupUI(timeFromText);
         dateText = (TextView) findViewById(R.id.dateText);
-        setupUI(dateText);
-        dateDate = (DatePicker) findViewById(R.id.dateAlarm);
-        setupUI(dateDate);
+        //setupUI(dateText);
+        //dateDate = (DatePicker) findViewById(R.id.dateAlarm);
+        //setupUI(dateDate);
         ok = (Button) findViewById(R.id.good);
+        chooseTime = (Button) findViewById(R.id.chooseTime);
+        chooseDate = (Button) findViewById(R.id.chooseDate);
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR},
                 1);
-
+        currentDateTime=(TextView)findViewById(R.id.currentDateTime);
+        setInitialDateTime();
     }
 
     private void setCustomActionBar() {
@@ -97,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         switch (requestCode) {
             case 1: {if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getCalendar();
+                getDateStartMillis();
             } else {
                 Toast.makeText(MainActivity.this, "Permission denied to read your Calendar", Toast.LENGTH_SHORT).show();
                 onBackPressed();
@@ -109,10 +122,10 @@ public class MainActivity extends AppCompatActivity {
     private void getCalendar() {
         final List<Calendar> calendars = Calendar.getWritableCalendars(getContentResolver());
         mCalendar = calendars.get(0);
-
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+
+
     private long createEvent(long calendarID) throws SecurityException {
         ContentResolver cr = getContentResolver();
         ContentValues contentValues = new ContentValues();
@@ -129,19 +142,67 @@ public class MainActivity extends AppCompatActivity {
         return id;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private long getDateStartMillis() {
-        java.util.Calendar calendar = java.util.Calendar.getInstance();
-        int year = dateDate.getYear();
-        int monthOfYear = dateDate.getMonth();
-        int dayOfMonth = dateDate.getDayOfMonth();
-        calendar.set(year, monthOfYear, dayOfMonth);
-        int hourOfDay = timeStart.getHour();
-        int minute = timeStart.getMinute();
-        calendar.set(java.util.Calendar.HOUR_OF_DAY, hourOfDay);
-        calendar.set(java.util.Calendar.MINUTE, minute);
-        return calendar.getTimeInMillis();
+
+    public void setDate(View v) {
+        new DatePickerDialog(MainActivity.this, d,
+                javaCalendar.get(java.util.Calendar.YEAR),
+                javaCalendar.get(java.util.Calendar.MONTH),
+                javaCalendar.get(java.util.Calendar.DAY_OF_MONTH))
+                .show();
     }
+    public void setTime(View v) {
+        new TimePickerDialog(MainActivity.this, t,
+                javaCalendar.get(java.util.Calendar.HOUR_OF_DAY),
+                javaCalendar.get(java.util.Calendar.MINUTE), true)
+                .show();
+    }
+    private void setInitialDateTime() {
+
+        currentDateTime .setText(DateUtils.formatDateTime(this,
+                javaCalendar.getTimeInMillis(),
+                DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
+                        | DateUtils.FORMAT_SHOW_TIME));
+    }
+    TimePickerDialog.OnTimeSetListener t=new TimePickerDialog.OnTimeSetListener() {
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            javaCalendar.set(java.util.Calendar.HOUR_OF_DAY, hourOfDay);
+            javaCalendar.set(java.util.Calendar.MINUTE, minute);
+            setInitialDateTime();
+        }
+    };
+
+    // установка обработчика выбора даты
+    DatePickerDialog.OnDateSetListener d=new DatePickerDialog.OnDateSetListener() {
+        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+            javaCalendar.set(java.util.Calendar.YEAR, year);
+            javaCalendar.set(java.util.Calendar.MONTH, monthOfYear);
+            javaCalendar.set(java.util.Calendar.DAY_OF_MONTH, dayOfMonth);
+            setInitialDateTime();
+        }
+    };
+
+
+    private long getDateStartMillis(){
+        if(javaCalendar!=null){
+        return javaCalendar.getTimeInMillis();}
+        else return 0;
+    }
+
+//    @TargetApi(15)
+//    private long getDateStartMillis() {
+//        java.util.Calendar calendar = java.util.Calendar.getInstance();
+//        int year = dateDate.getYear();
+//        int monthOfYear = dateDate.getMonth();
+//        int dayOfMonth = dateDate.getDayOfMonth();
+//        calendar.set(year, monthOfYear, dayOfMonth);
+//        @Deprecated
+//        int hourOfDay = timeStart.getCurrentHour();
+//        @Deprecated
+//        int minute = timeStart.getCurrentMinute();
+//        calendar.set(java.util.Calendar.HOUR_OF_DAY, hourOfDay);
+//        calendar.set(java.util.Calendar.MINUTE, minute);
+//        return calendar.getTimeInMillis();
+//    }
 
 
     private void setReminder(long eventID, int timeBefore) throws SecurityException {
@@ -168,7 +229,6 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     public void runForest(View v) {
         setReminder(createEvent(mCalendar.id), 1);
-        Toast.makeText(MainActivity.this, "ВСЕ ДОБРЕ, Я ТЕБЕ КОХАЮ!", Toast.LENGTH_LONG).show();
         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
         dialog.setTitle("ЩЕ ЩОСЬ ТРЕБА?");
         dialog.setPositiveButton("ТАК", new DialogInterface.OnClickListener()
@@ -189,22 +249,22 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    public void setupUI(View view) {
-        if (!(view instanceof EditText)) {
-            view.setOnTouchListener(new View.OnTouchListener() {
-                public boolean onTouch(View v, MotionEvent event) {
-                    hideSoftKeyboard(MainActivity.this);
-                    return false;
-                }
-            });
-        }
-    }
-
-    public static void hideSoftKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager =
-                (InputMethodManager) activity.getSystemService(
-                        Activity.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(
-                activity.getCurrentFocus().getWindowToken(), 0);
-    }
+//    public void setupUI(View view) {
+//        if (!(view instanceof EditText)) {
+//            view.setOnTouchListener(new View.OnTouchListener() {
+//                public boolean onTouch(View v, MotionEvent event) {
+//                    hideSoftKeyboard(MainActivity.this);
+//                    return false;
+//                }
+//            });
+//        }
+//    }
+//
+//    public static void hideSoftKeyboard(Activity activity) {
+//        InputMethodManager inputMethodManager =
+//                (InputMethodManager) activity.getSystemService(
+//                        Activity.INPUT_METHOD_SERVICE);
+//        inputMethodManager.hideSoftInputFromWindow(
+//                activity.getCurrentFocus().getWindowToken(), 0);
+//    }
 }
