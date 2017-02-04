@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
     TextView dateText;
     EditText title;
     EditText description;
-//    TimePicker timeStart;
+    //    TimePicker timeStart;
 //    DatePicker dateDate;
     Button ok;
     Button chooseTime;
@@ -73,11 +73,14 @@ public class MainActivity extends AppCompatActivity {
 
         title = (EditText) findViewById(R.id.title);
         description = (EditText) findViewById(R.id.description);
+        /*for API 23*/
 //        timeStart = (TimePicker) findViewById(R.id.timeStart);
 //        timeStart.setIs24HourView(true);
         timeFromText = (TextView) findViewById(R.id.timeFromText);
+        /*for API 23*/
         //setupUI(timeFromText);
         dateText = (TextView) findViewById(R.id.dateText);
+        /*for API 23*/
         //setupUI(dateText);
         //dateDate = (DatePicker) findViewById(R.id.dateAlarm);
         //setupUI(dateDate);
@@ -87,19 +90,22 @@ public class MainActivity extends AppCompatActivity {
         ActivityCompat.requestPermissions(MainActivity.this,
                 new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR},
                 1);
-        currentDateTime=(TextView)findViewById(R.id.currentDateTime);
+        currentDateTime = (TextView) findViewById(R.id.currentDateTime);
         setInitialDateTime();
     }
 
     private void setCustomActionBar() {
         ActionBar mActionBar = getSupportActionBar();
-        mActionBar.setDisplayShowHomeEnabled(false);
-        mActionBar.setDisplayShowTitleEnabled(false);
-        LayoutInflater mInflater = LayoutInflater.from(this);
-        View mCustomView = mInflater.inflate(R.layout.custom_title_bar, null);
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
-        mActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFC0CB")));
+        mActionBar.hide();
+
+       /* custom actionbar if needed*/
+//        mActionBar.setDisplayShowHomeEnabled(false);
+//        mActionBar.setDisplayShowTitleEnabled(false);
+//        LayoutInflater mInflater = LayoutInflater.from(this);
+//        View mCustomView = mInflater.inflate(R.layout.custom_title_bar, null);
+//        mActionBar.setCustomView(mCustomView);
+//        mActionBar.setDisplayShowCustomEnabled(true);
+//        mActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FFC0CB")));
 
     }
 
@@ -107,12 +113,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
-            case 1: {if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            case 1: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     getCalendar();
-                getDateStartMillis();
-            } else {
-                Toast.makeText(MainActivity.this, "Permission denied to read your Calendar", Toast.LENGTH_SHORT).show();
-                onBackPressed();
+                    getDateStartMillis();
+                } else {
+                    Toast.makeText(MainActivity.this, "Permission denied to read your Calendar", Toast.LENGTH_SHORT).show();
+                    onBackPressed();
                 }
                 return;
             }
@@ -123,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
         final List<Calendar> calendars = Calendar.getWritableCalendars(getContentResolver());
         mCalendar = calendars.get(0);
     }
-
 
 
     private long createEvent(long calendarID) throws SecurityException {
@@ -150,20 +156,23 @@ public class MainActivity extends AppCompatActivity {
                 javaCalendar.get(java.util.Calendar.DAY_OF_MONTH))
                 .show();
     }
+
     public void setTime(View v) {
         new TimePickerDialog(MainActivity.this, t,
                 javaCalendar.get(java.util.Calendar.HOUR_OF_DAY),
                 javaCalendar.get(java.util.Calendar.MINUTE), true)
                 .show();
     }
+
     private void setInitialDateTime() {
 
-        currentDateTime .setText(DateUtils.formatDateTime(this,
+        currentDateTime.setText(DateUtils.formatDateTime(this,
                 javaCalendar.getTimeInMillis(),
                 DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR
                         | DateUtils.FORMAT_SHOW_TIME));
     }
-    TimePickerDialog.OnTimeSetListener t=new TimePickerDialog.OnTimeSetListener() {
+
+    TimePickerDialog.OnTimeSetListener t = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             javaCalendar.set(java.util.Calendar.HOUR_OF_DAY, hourOfDay);
             javaCalendar.set(java.util.Calendar.MINUTE, minute);
@@ -172,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     // установка обработчика выбора даты
-    DatePickerDialog.OnDateSetListener d=new DatePickerDialog.OnDateSetListener() {
+    DatePickerDialog.OnDateSetListener d = new DatePickerDialog.OnDateSetListener() {
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             javaCalendar.set(java.util.Calendar.YEAR, year);
             javaCalendar.set(java.util.Calendar.MONTH, monthOfYear);
@@ -182,12 +191,14 @@ public class MainActivity extends AppCompatActivity {
     };
 
 
-    private long getDateStartMillis(){
-        if(javaCalendar!=null){
-        return javaCalendar.getTimeInMillis();}
-        else return 0;
+    private long getDateStartMillis() {
+        if (javaCalendar != null) {
+            return javaCalendar.getTimeInMillis();
+        } else return 0;
     }
 
+    /* for API 23
+     * Method for new timericker and datepicker*/
 //    @TargetApi(15)
 //    private long getDateStartMillis() {
 //        java.util.Calendar calendar = java.util.Calendar.getInstance();
@@ -231,15 +242,13 @@ public class MainActivity extends AppCompatActivity {
         setReminder(createEvent(mCalendar.id), 1);
         AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
         dialog.setTitle("ЩЕ ЩОСЬ ТРЕБА?");
-        dialog.setPositiveButton("ТАК", new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int which){
+        dialog.setPositiveButton("ТАК", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 finish();
                 startActivity(getIntent());
             }
-        }).setNegativeButton("НІ", new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int which){
+        }).setNegativeButton("НІ", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
                 onBackPressed();
                 finish();
             }
@@ -249,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
         dialog.show();
     }
 
+/*setup hide keyboard whet touch anywhere*/
 //    public void setupUI(View view) {
 //        if (!(view instanceof EditText)) {
 //            view.setOnTouchListener(new View.OnTouchListener() {
